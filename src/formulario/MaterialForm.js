@@ -28,7 +28,7 @@ const MaterialForm = () => {
     // Envía los datos al backend utilizando fetch
     const respuesta = await fetch("/api/materiales", {
       method: "POST",
-
+        
       headers: {
         "Content-Type": "application/json",
       },

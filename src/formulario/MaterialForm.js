@@ -10,17 +10,24 @@ import {
   FormControl,
   FormLabel,
   Select,
+  useToast,
 } from "@chakra-ui/react";
 
 const MaterialForm = () => {
   const [nivel, setNivel] = useState("");
-  const [privilegios, setPrivilegios] = useState(false);
+  const [premium, setPremium] = useState(false);
   const [tipo, setTipo] = useState("");
   const [titulo, setTitulo] = useState("");
   const [urlImagen, setUrlImagen] = useState("");
   const [urlTitulo, setUrlTitulo] = useState("");
   const [palabrasClave, setPalabrasClave] = useState("");
   const [descripcion, setDescripcion] = useState("");
+  const [descripcionIngles, setDescripcionIngles] = useState("");
+  const [contenidoMaterial, setContenidoMaterial] = useState("");
+  const [contenidoMaterialIngles, setContenidoMaterialIngles] = useState("");
+  const [autor, setAutor] = useState("");
+
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,32 +35,54 @@ const MaterialForm = () => {
     // Envía los datos al backend utilizando fetch
     const respuesta = await fetch("/api/materiales", {
       method: "POST",
-        
+
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         nivel,
         fecha: new Date(),
-        privilegios,
+        premium,
         tipo,
         titulo,
         urlImagen,
         urlTitulo,
         palabrasClave,
         descripcion,
+        descripcionIngles,
+        contenidoMaterial,
+        contenidoMaterialIngles,
+        autor,
       }),
     });
 
     // Manejar la respuesta del servidor según sea necesario
     if (respuesta.ok) {
       console.log("Material creado exitosamente");
-      // Puedes redirigir o realizar otras acciones aquí
+      // Mostrar el toast de éxito
+      toast({
+        title: "Material creado con éxito",
+        status: "success",
+        duration: 3000, // Duration of the toast message in milliseconds
+        isClosable: true,
+        position: "bottom",
+      });
+      console.log("After toast");
     } else {
       console.error("Error al crear el material");
       // Manejar errores aquí
+      toast({
+        title: "Error al  crear con éxito",
+        status: "error",
+        duration: 3000, // Duration of the toast message in milliseconds
+        isClosable: true,
+        position: "bottom",
+      });
     }
   };
+
+  
+
 
   return (
     <Box maxW="xl" mx="auto" p={6}>
@@ -68,13 +97,15 @@ const MaterialForm = () => {
             <option value="C1">C1</option>
             <option value="C2">C2</option>
           </Select>
-     
-          <FormLabel style={{ color: "blue" }}>Privilegios</FormLabel>
+
+          <FormLabel style={{ color: "green" }} pt={6}>
+            Premium
+          </FormLabel>
           <Checkbox
-            isChecked={privilegios}
-            onChange={(e) => setPrivilegios(e.target.checked)}
+            isChecked={premium}
+            onChange={(e) => setPremium(e.target.checked)}
           >
-            ¿Click aqui si es Exclusivo de Suscriptores?
+            Click aqui si es PREMIUM content para Suscriptores
           </Checkbox>
         </FormControl>
         <FormControl>
@@ -126,33 +157,65 @@ const MaterialForm = () => {
             resize="vertical"
           />
         </FormControl>
+
         <FormControl>
           <FormLabel>Descripción Ingles</FormLabel>
           <Textarea
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
+            value={descripcionIngles}
+            onChange={(e) => setDescripcionIngles(e.target.value)}
             resize="vertical"
           />
         </FormControl>
+
         <FormControl>
           <FormLabel>Contenido material</FormLabel>
           <Textarea
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
+            value={contenidoMaterial}
+            onChange={(e) => setContenidoMaterial(e.target.value)}
+            resize="vertical"
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Contenido material Ingles</FormLabel>
+          <Textarea
+            value={contenidoMaterialIngles}
+            onChange={(e) => setContenidoMaterialIngles(e.target.value)}
             resize="vertical"
           />
         </FormControl>
         <FormControl>
-          <FormLabel>Contenido material Ingles</FormLabel>
+          <FormLabel>Autor</FormLabel>
           <Textarea
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
+            value={autor}
+            onChange={(e) => setAutor(e.target.value)}
             resize="vertical"
           />
         </FormControl>
         <Button
           type="submit"
           onClick={handleSubmit}
+          ml="4"
+          border="2px solid green"
+          color="green"
+          width="auto"
+          _hover={{
+            bg: "green.500",
+            color: "white",
+          }}
+        >
+          Agregar Material
+        </Button>
+
+        <FormControl>
+          <FormLabel>Título del material a eliminar</FormLabel>
+          <Input
+            type="text"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+          />
+        </FormControl>
+        <Button
           ml="4"
           border="2px solid red"
           color="red"
@@ -162,7 +225,7 @@ const MaterialForm = () => {
             color: "white",
           }}
         >
-          Agregar Material
+          Eliminar Material
         </Button>
       </VStack>
     </Box>

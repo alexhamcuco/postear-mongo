@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+
 const materialSchema = new Schema({
   nivel: String,
   fecha: Date,
@@ -13,7 +14,10 @@ const materialSchema = new Schema({
   contenidoMaterial: String,
   contenidoMaterialIngles: String,
   autor: String,
+  points: { type: Number, default: 0 }, // Add points property with default value 0
 });
+
 const Material =
   mongoose.models.Material || mongoose.model("Material", materialSchema);
+
 export default Material;

@@ -1,3 +1,5 @@
+
+
 // src/formulario/MaterialForm.js
 import { useState } from "react";
 import {
@@ -26,6 +28,7 @@ const MaterialForm = () => {
   const [contenidoMaterial, setContenidoMaterial] = useState("");
   const [contenidoMaterialIngles, setContenidoMaterialIngles] = useState("");
   const [autor, setAutor] = useState("");
+  const [points, setPoints] = useState(0); // Track points locally
 
   const toast = useToast();
 
@@ -35,7 +38,6 @@ const MaterialForm = () => {
     // Envía los datos al backend utilizando fetch
     const respuesta = await fetch("/api/materiales", {
       method: "POST",
-
       headers: {
         "Content-Type": "application/json",
       },
@@ -53,6 +55,7 @@ const MaterialForm = () => {
         contenidoMaterial,
         contenidoMaterialIngles,
         autor,
+        points: 0, // Points will be updated when the student clicks the button
       }),
     });
 
@@ -81,8 +84,11 @@ const MaterialForm = () => {
     }
   };
 
-  
-
+  const handlePointsButtonClick = () => {
+    // Update points locally when the button is clicked
+    setPoints(points + 1);
+    // You can also send the updated points to the backend if needed
+  };
 
   return (
     <Box maxW="xl" mx="auto" p={6}>
@@ -227,10 +233,43 @@ const MaterialForm = () => {
         >
           Eliminar Material
         </Button>
+
+        <Button
+          type="submit"
+          onClick={handleSubmit}
+          ml="4"
+          border="2px solid green"
+          color="green"
+          width="auto"
+          _hover={{
+            bg: "green.500",
+            color: "white",
+          }}
+        >
+          Agregar Material
+        </Button>
+
+        {/* Button for awarding points */}
+        <Button
+          onClick={handlePointsButtonClick}
+          ml="4"
+          border="2px solid blue"
+          color="blue"
+          width="auto"
+          _hover={{
+            bg: "blue.500",
+            color: "white",
+          }}
+        >
+          Award Points
+        </Button>
       </VStack>
+      {/* Display points to the user */}
+      <Box mt={4} fontWeight="bold">
+        Total Points: {points}
+      </Box>
     </Box>
   );
 };
 
 export default MaterialForm;
- 

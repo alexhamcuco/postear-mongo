@@ -29,6 +29,7 @@ const MaterialForm = () => {
   const [contenidoMaterialIngles, setContenidoMaterialIngles] = useState("");
   const [autor, setAutor] = useState("");
   const [points, setPoints] = useState(0); // Track points locally
+  const [sequentialNumber, setSequentialNumber] = useState(1);
 
   const toast = useToast();
 
@@ -55,7 +56,8 @@ const MaterialForm = () => {
         contenidoMaterial,
         contenidoMaterialIngles,
         autor,
-        points: 0, // Points will be updated when the student clicks the button
+        points: 0,
+        sequentialNumber, // Points will be updated when the student clicks the button
       }),
     });
 
@@ -113,6 +115,17 @@ const MaterialForm = () => {
           >
             Click aqui si es PREMIUM content para Suscriptores
           </Checkbox>
+          <FormControl>
+            <FormLabel>Sequential Number</FormLabel>
+            <Input
+              type="number"
+              value={sequentialNumber}
+              onChange={(e) =>
+                setSequentialNumber(parseInt(e.target.value) || "")
+              }
+              min="1" // Ensuring the number is positive
+            />
+          </FormControl>
         </FormControl>
         <FormControl>
           <FormLabel>Tipo</FormLabel>
@@ -232,21 +245,6 @@ const MaterialForm = () => {
           }}
         >
           Eliminar Material
-        </Button>
-
-        <Button
-          type="submit"
-          onClick={handleSubmit}
-          ml="4"
-          border="2px solid green"
-          color="green"
-          width="auto"
-          _hover={{
-            bg: "green.500",
-            color: "white",
-          }}
-        >
-          Agregar Material
         </Button>
 
         {/* Button for awarding points */}

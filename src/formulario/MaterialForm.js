@@ -30,6 +30,8 @@ const MaterialForm = () => {
   const [autor, setAutor] = useState("");
   const [points, setPoints] = useState(0); // Track points locally
   const [sequentialNumber, setSequentialNumber] = useState(1);
+    const [urlContenido, setUrlContenido] = useState("");
+
 
   const toast = useToast();
 
@@ -57,7 +59,8 @@ const MaterialForm = () => {
         contenidoMaterialIngles,
         autor,
         points: 0,
-        sequentialNumber, // Points will be updated when the student clicks the button
+        sequentialNumber,
+        urlContenido, // Points will be updated when the student clicks the button
       }),
     });
 
@@ -150,6 +153,14 @@ const MaterialForm = () => {
             type="text"
             value={urlImagen}
             onChange={(e) => setUrlImagen(e.target.value)}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>URL del Contenido</FormLabel>
+          <Input
+            type="text"
+            value={urlContenido}
+            onChange={(e) => setUrlContenido(e.target.value)}
           />
         </FormControl>
         <FormControl>

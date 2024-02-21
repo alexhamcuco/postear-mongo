@@ -14,6 +14,7 @@ const materialSchema = new Schema({
   contenidoMaterial: String,
   contenidoMaterialIngles: String,
   autor: String,
+  urlContenido: String,
   points: { type: Number, default: 0 }, // Add points property with default value 0
   sequentialNumber: { type: Number, required: true },
 });

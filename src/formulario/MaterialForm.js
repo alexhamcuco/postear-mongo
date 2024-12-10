@@ -1,6 +1,3 @@
-
-
-// src/formulario/MaterialForm.js
 import { useState } from "react";
 import {
   Box,
@@ -28,17 +25,23 @@ const MaterialForm = () => {
   const [contenidoMaterial, setContenidoMaterial] = useState("");
   const [contenidoMaterialIngles, setContenidoMaterialIngles] = useState("");
   const [autor, setAutor] = useState("");
-  const [points, setPoints] = useState(0); // Track points locally
+  const [points, setPoints] = useState(0);
   const [sequentialNumber, setSequentialNumber] = useState(1);
-    const [urlContenido, setUrlContenido] = useState("");
+  const [urlContenido, setUrlContenido] = useState("");
 
+  // Estado para el título del material a eliminar
+  const [tituloEliminar, setTituloEliminar] = useState("");
+
+  // Estado para el título del material a conseguir (GET)
+  const [tituloACargar, setTituloACargar] = useState("");
+
+  // Estado para el contenido del correo
+  const [emailContent, setEmailContent] = useState("");
 
   const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Envía los datos al backend utilizando fetch
     const respuesta = await fetch("/api/materiales", {
       method: "POST",
       headers: {
@@ -60,29 +63,23 @@ const MaterialForm = () => {
         autor,
         points: 0,
         sequentialNumber,
-        urlContenido, // Points will be updated when the student clicks the button
+        urlContenido,
       }),
     });
 
-    // Manejar la respuesta del servidor según sea necesario
     if (respuesta.ok) {
-      console.log("Material creado exitosamente");
-      // Mostrar el toast de éxito
       toast({
         title: "Material creado con éxito",
         status: "success",
-        duration: 3000, // Duration of the toast message in milliseconds
+        duration: 3000,
         isClosable: true,
         position: "bottom",
       });
-      console.log("After toast");
     } else {
-      console.error("Error al crear el material");
-      // Manejar errores aquí
       toast({
-        title: "Error al  crear con éxito",
+        title: "Error al crear el material",
         status: "error",
-        duration: 3000, // Duration of the toast message in milliseconds
+        duration: 3000,
         isClosable: true,
         position: "bottom",
       });
@@ -90,14 +87,232 @@ const MaterialForm = () => {
   };
 
   const handlePointsButtonClick = () => {
-    // Update points locally when the button is clicked
     setPoints(points + 1);
-    // You can also send the updated points to the backend if needed
+  };
+
+  const handleEditMaterial = async () => {
+    if (!titulo) {
+      toast({
+        title: "El título es obligatorio para modificar",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    const response = await fetch(
+      `/api/materiales?title=${encodeURIComponent(titulo)}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nivel,
+          premium,
+          tipo,
+          titulo,
+          urlImagen,
+          urlTitulo,
+          palabrasClave,
+          descripcion,
+          descripcionIngles,
+          contenidoMaterial,
+          contenidoMaterialIngles,
+          autor,
+          points,
+          sequentialNumber,
+          urlContenido,
+        }),
+      }
+    );
+
+    if (response.ok) {
+      toast({
+        title: "Material modificado con éxito",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+    } else {
+      toast({
+        title: "Error al modificar el material",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    const response = await fetch(
+      `/api/materiales?title=${encodeURIComponent(tituloEliminar)}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (response.ok) {
+      toast({
+        title: "Material eliminado con éxito",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setTituloEliminar("");
+    } else {
+      toast({
+        title: "Error al eliminar el material",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+
+  // Función para conseguir datos del material por título (GET)
+  const handleGetMaterial = async () => {
+    if (!tituloACargar) {
+      toast({
+        title: "Debes ingresar un título",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    const response = await fetch(
+      `/api/materiales?title=${encodeURIComponent(tituloACargar)}`
+    );
+    if (response.ok) {
+      const materials = await response.json();
+      // asumiendo que la respuesta es un array de materiales
+      const material = Array.isArray(materials) ? materials[0] : materials;
+      if (material) {
+        // Rellenar los estados con los datos del material obtenido
+        setNivel(material.nivel || "");
+        setPremium(material.premium || false);
+        setTipo(material.tipo || "");
+        setTitulo(material.titulo || "");
+        setUrlImagen(material.urlImagen || "");
+        setUrlTitulo(material.urlTitulo || "");
+        setPalabrasClave(material.palabrasClave || "");
+        setDescripcion(material.descripcion || "");
+        setDescripcionIngles(material.descripcionIngles || "");
+        setContenidoMaterial(material.contenidoMaterial || "");
+        setContenidoMaterialIngles(material.contenidoMaterialIngles || "");
+        setAutor(material.autor || "");
+        setPoints(material.points || 0);
+        setSequentialNumber(material.sequentialNumber || 1);
+        setUrlContenido(material.urlContenido || "");
+
+        toast({
+          title: "Datos del material cargados con éxito",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "bottom",
+        });
+      } else {
+        toast({
+          title: "No se encontró el material",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
+    } else {
+      toast({
+        title: "Error al obtener el material",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+
+  // Función para enviar el correo masivo
+  const handleSendNewsletterToAll = async () => {
+    if (!emailContent.trim()) {
+      toast({
+        title: "El contenido del correo no puede estar vacío",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/send-newsletter-to-all", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: emailContent }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Correo enviado a todos los suscriptores",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "bottom",
+        });
+        setEmailContent(""); // Limpia el contenido del correo después de enviarlo
+      } else {
+        const error = await response.json();
+        throw new Error(error.message || "Error al enviar el correo");
+      }
+    } catch (error) {
+      toast({
+        title: error.message || "Error al enviar el correo",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
   };
 
   return (
     <Box maxW="xl" mx="auto" p={6}>
       <VStack spacing={4}>
+        {/* Campo y botón para conseguir datos del material */}
+        <FormControl>
+          <FormLabel>Título del material a conseguir</FormLabel>
+          <Input
+            type="text"
+            value={tituloACargar}
+            onChange={(e) => setTituloACargar(e.target.value)}
+          />
+        </FormControl>
+        <Button
+          onClick={handleGetMaterial}
+          ml="4"
+          border="2px solid blue"
+          color="blue"
+          width="auto"
+          _hover={{
+            bg: "blue.500",
+            color: "white",
+          }}
+        >
+          Conseguir Datos Material
+        </Button>
+
         <FormControl>
           <FormLabel>Nivel</FormLabel>
           <Select value={nivel} onChange={(e) => setNivel(e.target.value)}>
@@ -126,7 +341,7 @@ const MaterialForm = () => {
               onChange={(e) =>
                 setSequentialNumber(parseInt(e.target.value) || "")
               }
-              min="1" // Ensuring the number is positive
+              min="1"
             />
           </FormControl>
         </FormControl>
@@ -185,6 +400,10 @@ const MaterialForm = () => {
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             resize="vertical"
+            height="300px" // Ajusta la altura
+            width="100%" // Ancho completo del contenedor
+            minHeight="150px" // Altura mínima
+            maxWidth="800px" // Ancho máximo del cuadro
           />
         </FormControl>
 
@@ -202,7 +421,11 @@ const MaterialForm = () => {
           <Textarea
             value={contenidoMaterial}
             onChange={(e) => setContenidoMaterial(e.target.value)}
-            resize="vertical"
+            resize="vertical" // Permite cambiar el tamaño verticalmente
+            height="300px" // Ajusta la altura
+            width="100%" // Ancho completo del contenedor
+            minHeight="150px" // Altura mínima
+            maxWidth="800px" // Ancho máximo del cuadro
           />
         </FormControl>
 
@@ -222,6 +445,9 @@ const MaterialForm = () => {
             resize="vertical"
           />
         </FormControl>
+        <Button onClick={handleEditMaterial} colorScheme="orange">
+          Modificar Material
+        </Button>
         <Button
           type="submit"
           onClick={handleSubmit}
@@ -237,15 +463,17 @@ const MaterialForm = () => {
           Agregar Material
         </Button>
 
+        {/* Campo y botón para eliminar material */}
         <FormControl>
           <FormLabel>Título del material a eliminar</FormLabel>
           <Input
             type="text"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
+            value={tituloEliminar}
+            onChange={(e) => setTituloEliminar(e.target.value)}
           />
         </FormControl>
         <Button
+          onClick={handleDelete}
           ml="4"
           border="2px solid red"
           color="red"
@@ -258,7 +486,7 @@ const MaterialForm = () => {
           Eliminar Material
         </Button>
 
-        {/* Button for awarding points */}
+        {/* Botón para incrementar puntos */}
         <Button
           onClick={handlePointsButtonClick}
           ml="4"
@@ -273,9 +501,29 @@ const MaterialForm = () => {
           Award Points
         </Button>
       </VStack>
-      {/* Display points to the user */}
       <Box mt={4} fontWeight="bold">
         Total Points: {points}
+      </Box>
+      <Box maxW="xl" mx="auto" p={6}>
+        <VStack spacing={4}>
+          <FormControl>
+            <FormLabel>Contenido del correo masivo</FormLabel>
+            <Textarea
+              placeholder="Escribe el contenido del correo aquí..."
+              value={emailContent}
+              onChange={(e) => setEmailContent(e.target.value)}
+              resize="vertical"
+              height="150px" // Altura ajustada
+            />
+          </FormControl>
+          <Button
+            onClick={handleSendNewsletterToAll}
+            colorScheme="green"
+            width="auto"
+          >
+            Enviar Correo a Todos
+          </Button>
+        </VStack>
       </Box>
     </Box>
   );

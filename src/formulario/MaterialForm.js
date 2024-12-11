@@ -287,6 +287,14 @@ const MaterialForm = () => {
     }
   };
 
+  const handleMesage = async () => {
+    const res = await axios.post("http://localhost:3002/api/users/listEmails", {
+      subject: "mensaje grupal",
+      html: "hola a todos",
+    });
+    console.log(res.data);
+  };
+
   return (
     <Box maxW="xl" mx="auto" p={6}>
       <VStack spacing={4}>
@@ -522,6 +530,10 @@ const MaterialForm = () => {
             width="auto"
           >
             Enviar Correo a Todos
+          </Button>
+
+          <Button onClick={handleMesage} colorScheme="green" width="auto">
+            hola
           </Button>
         </VStack>
       </Box>

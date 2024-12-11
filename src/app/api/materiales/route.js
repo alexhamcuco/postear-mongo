@@ -105,46 +105,4 @@ export const sendNewsletterToAll = async (req) => {
 
   await connectMongoDB();
   console.log("Conectado a MongoDB");
-
-  // Obtener la lista de suscriptores
-
-  const newsletterList = await UserNewsletter.find();
-  const newsletterEmails = newsletterList.map(
-    (usernewsletters) => usernewsletters.email
-  );
-
-  console.log("emails de todos", newsletterList);
-
-  try {
-    const transporter = createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      ignoreTLS: true,
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
-      to: newsletterEmails.join(","), // Combina correos en una lista separada por comas
-      subject: "¡Novedades de nuestra newsletter!",
-      html: content, // Contenido dinámico del correo
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    return NextResponse.json(
-      { message: "Correo enviado a todos los suscriptores" },
-      { status: 200, headers: corsHeaders }
-    );
-  } catch (error) {
-    console.error("Error enviando correo: ", error);
-    return NextResponse.json(
-      { message: "Error al enviar los correos", error: error.message },
-      { status: 500, headers: corsHeaders }
-    );
-  }
 };
